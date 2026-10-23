@@ -1,7 +1,9 @@
-FROM alpine:latest
+FROM alpine:3.22
 
-RUN apk --update --no-cache add curl ca-certificates nginx
-RUN apk add php8 php8-xml php8-exif php8-fpm php8-session php8-soap php8-openssl php8-gmp php8-pdo_odbc php8-json php8-dom php8-pdo php8-zip php8-mysqli php8-sqlite3 php8-pdo_pgsql php8-bcmath php8-gd php8-odbc php8-pdo_mysql php8-pdo_sqlite php8-gettext php8-xmlreader php8-bz2 php8-iconv php8-pdo_dblib php8-curl php8-ctype php8-phar php8-fileinfo php8-mbstring php8-tokenizer php8-simplexml
+RUN apk upgrade --no-cache && apk add --no-cache curl ca-certificates nginx
+RUN apk add --no-cache php84 php84-xml php84-exif php84-fpm php84-session php84-soap php84-openssl php84-gmp php84-pdo_odbc php84-dom php84-pdo php84-zip php84-mysqli php84-sqlite3 php84-pdo_pgsql php84-bcmath php84-gd php84-odbc php84-pdo_mysql php84-pdo_sqlite php84-gettext php84-xmlreader php84-bz2 php84-iconv php84-pdo_dblib php84-curl php84-ctype php84-phar php84-fileinfo php84-mbstring php84-tokenizer php84-simplexml
+# fail the build if PHP is older than the release fixing CVE-2026-109618/109619 (8.4.27)
+RUN php84 -r 'exit(version_compare(PHP_VERSION, "8.4.27", ">=") ? 0 : 1);' || (echo "PHP too old, vulnerable to CVE-2026-109618/109619" >&2; exit 1)
 COPY --from=composer:latest  /usr/bin/composer /usr/bin/composer
 
 USER container
